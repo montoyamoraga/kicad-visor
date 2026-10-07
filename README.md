@@ -107,18 +107,32 @@ kicad-visor init   path/to/repo     # write an example kicad-visor-config.py
 Output, per project (folder names follow `language`; these are the Spanish defaults):
 
 ```
-docs/kicad-visor/<project>/
-  esquematico/  one svg/png/jpg per sheet, one multi-page pdf
-  placa/        2D views: frente, reverso, cobre, todo, and each layer alone
-                (f-cu, b-cu, f-mask, b-mask, f-silks, b-silks, edge-cuts)
-  3d/           renders: arriba, abajo, iso-frente, iso-reverso, perspectiva
-  video/        turntables: <axis>-<direction>-<aspect>-<background>.mp4
-                e.g. z-ccw-vertical-rosado.mp4, y-right-cuadrado-durazno.mp4
+docs/kicad-visor/
+  index.html        every project, with a picture of each
+  <project>/
+    index.html      the project's page: everything below, ready to browse
+    esquematico/    one svg/png/jpg per sheet, one multi-page pdf
+    placa/          2D views: frente, reverso, cobre, todo, and each layer alone
+                    (f-cu, b-cu, f-mask, b-mask, f-silks, b-silks, edge-cuts)
+    3d/             renders: arriba, abajo, iso-frente, iso-reverso, perspectiva
+    video/          turntables: <axis>-<direction>-<aspect>-<background>.mp4
+                    e.g. z-ccw-vertical-rosado.mp4, y-right-cuadrado-durazno.mp4
 ```
 
-These folders are owned by kicad-visor and wiped on each export. Back-side 2D views are mirrored, as seen from behind the board. 3D png files are transparent; jpg files get `background`.
+The `index.html` pages make the output a website: open them locally, or publish the folder (see below). They show whatever is in the output folder, so exporting only some outputs still gives complete pages.
+
+These folders are owned by kicad-visor and wiped on each export. Back-side 2D views are mirrored, as seen from behind the board. Silkscreen and board-outline views get a dark background in every format, since KiCad draws them in pale colors. 3D png files are transparent; jpg files get `background`.
 
 Turntables are not part of the default export, because they take tens of minutes per board: add `--only turntable`. The defaults are two turntables, `z`/`ccw` and `y`/`right`, each rendered for every aspect (horizontal 1920×1080, vertical 1080×1920, square 1080×1080) and laid over every background (white, green, pink, peach): 24 videos per board.
+
+## Publishing to GitHub Pages
+
+[examples/github-pages.yml](examples/github-pages.yml) is a GitHub Actions workflow that exports every KiCad project in a repository and publishes the result as a website, on every push to `main`. Nothing gets committed: the renders go straight to GitHub Pages.
+
+1. Copy it to `.github/workflows/kicad-visor.yml` in the repository with your boards.
+2. In the repository's Settings > Pages, set the source to "GitHub Actions".
+
+It runs inside the official `kicad/kicad:10.0-full` image (KiCad 10 with 3D models); change the version to match the KiCad your boards were saved with. A `kicad-visor-config.py` at the root of the repository is used, as locally. Turntable videos are off by default; add `turntable` to `ONLY` in the workflow to enable them. The first run renders frames for tens of minutes per board; they are cached between runs and only rendered again when a board changes.
 
 ## Configuration
 

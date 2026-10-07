@@ -16,7 +16,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import List, Optional, Union
 
-from kicad_visor import pcb, render, schematic, turntable
+from kicad_visor import pcb, render, schematic, site, turntable
 from kicad_visor.config import Config, ConfigError, validate
 from kicad_visor.discover import find_projects
 from kicad_visor.motion import AXES
@@ -24,7 +24,7 @@ from kicad_visor.tools import ToolError
 from kicad_visor.turntable import video as turntable_video
 from kicad_visor.util import slug
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 __all__ = ["AXES", "Config", "ConfigError", "ToolError", "export", "turntable_video"]
 
@@ -37,6 +37,9 @@ def export(target: Union[str, Path], config: Optional[Config] = None, *,
         is relative to `target` unless absolute.
     verbose: print every external command.
 
+    Also writes index.html pages to browse the results, in the output
+    folder and in each project's folder.
+
     Returns the files written. Raises ToolError when an external program
     (kicad-cli, rsvg-convert, ffmpeg) is missing or fails.
     """
@@ -45,10 +48,13 @@ def export(target: Union[str, Path], config: Optional[Config] = None, *,
     config = config or Config()
     validate(config)
     target = Path(target).resolve()
-    out_root = config.output_dir(target if target.is_dir() else target.parent)
+    base = target if target.is_dir() else target.parent
+    out_root = config.output_dir(base)
     written: List[Path] = []
     for project in find_projects(target, config.exclude):
         for output in config.outputs:
             out = out_root / slug(project.name) / slug(config.label(output))
             written += exporters[output].export(project, out, config, verbose)
+    if written:
+        written += site.write(out_root, config, base.name)
     return written

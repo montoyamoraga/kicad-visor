@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import List
 
@@ -9,6 +10,18 @@ from kicad_visor import raster, tools
 from kicad_visor.config import Config
 from kicad_visor.discover import Project
 from kicad_visor.util import fresh_dir, slug
+
+
+def _paint_background(svg: Path, color: str) -> None:
+    """Fill the svg's whole page with `color`, under everything else."""
+    text = svg.read_text(encoding="utf-8")
+    root = re.search(r"<svg\b[^>]*>", text)
+    box = re.search(r'viewBox="([^"]+)"', root.group(0)) if root else None
+    if box is None:
+        return
+    x, y, width, height = box.group(1).split()
+    rect = f'\n<rect x="{x}" y="{y}" width="{width}" height="{height}" fill="{color}"/>'
+    svg.write_text(text[:root.end()] + rect + text[root.end():], encoding="utf-8")
 
 
 def export(project: Project, out: Path, config: Config,
@@ -36,6 +49,8 @@ def export(project: Project, out: Path, config: Config,
         if config.black_and_white:
             args.append("--black-and-white")
         tools.run(args + ["-o", str(svg), str(board)], verbose)
+        if view.get("background"):
+            _paint_background(svg, view["background"])
 
         # The pdf comes from the svg so it is cropped to the board the same way.
         if "pdf" in config.formats:

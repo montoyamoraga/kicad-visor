@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 from typing import List, Optional
 
-from kicad_visor import __version__, pcb, render, schematic, tools, turntable
+from kicad_visor import __version__, pcb, render, schematic, site, tools, turntable
 from kicad_visor.config import (ASPECTS, BACKGROUNDS, CONFIG_FILENAME, DEFAULT_OUTPUTS, FORMATS, OUTPUTS,
                                 TURNTABLES, Config, ConfigError, load, validate)
 from kicad_visor.discover import find_projects
@@ -213,6 +213,8 @@ def cmd_export(args: argparse.Namespace) -> int:
                 print(f"  {output}: nothing to export")
             for path in files:
                 print(f"  {path.relative_to(out_root)}")
+    site.write(out_root, config, base.name)
+    print(f"web pages: {out_root / 'index.html'}")
     return 1 if failures else 0
 
 

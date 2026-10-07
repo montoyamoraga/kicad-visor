@@ -46,20 +46,30 @@ LABELS = {
         "green": "verde",
         "pink": "rosado",
         "peach": "durazno",
+        # Words on the generated web pages.
+        "projects": "proyectos",
+        "made-with": "hecho con",
     },
     "en": {
         "schematic": "schematic",
         "pcb": "pcb",
         "render": "3d",
         "turntable": "video",
+        "made-with": "made with",
     },
 }
 
 EDGE = "Edge.Cuts"
 LAYERS = ["F.Cu", "B.Cu", "F.Mask", "B.Mask", "F.SilkS", "B.SilkS", EDGE]
 
+# Behind layers KiCad draws in pale colors (silkscreen, board outline),
+# which vanish on white.
+DARK = "#2b3530"
+
 # 2D PCB views. Each is one image made of `layers`; back views are mirrored
-# so they read as seen from behind the board.
+# so they read as seen from behind the board. "background" paints behind the
+# view in every format; without it, png/jpg get `background` and svg/pdf
+# stay transparent.
 PCB_VIEWS: List[Dict[str, Any]] = [
     {"name": "front", "layers": ["F.Cu", "F.Mask", "F.SilkS", EDGE]},
     {"name": "back", "layers": ["B.Cu", "B.Mask", "B.SilkS", EDGE], "mirror": True},
@@ -68,7 +78,8 @@ PCB_VIEWS: List[Dict[str, Any]] = [
 ] + [
     # Every layer alone, with the board outline for context.
     {"name": layer, "layers": [layer] if layer == EDGE else [layer, EDGE],
-     "mirror": layer.startswith("B.")}
+     "mirror": layer.startswith("B."),
+     **({"background": DARK} if layer in ("F.SilkS", "B.SilkS", EDGE) else {})}
     for layer in LAYERS
 ]
 
