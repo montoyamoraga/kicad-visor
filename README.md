@@ -4,6 +4,12 @@ Docs out of KiCad projects: schematics, PCB layers, 3D renders and seamlessly lo
 
 Made by [piruetas](https://piruetas.xyz), an art studio from Chile.
 
+<p align="center">
+  <img src="media/turntable.gif" width="360" alt="A circuit board spinning in a seamless loop, rendered by kicad-visor">
+</p>
+
+**See it live:** [piruetas.xyz/kicad-visor-demo](https://piruetas.xyz/kicad-visor-demo/) is a website kicad-visor builds and publishes from a [repository with one board](https://github.com/piruetasxyz/kicad-visor-demo): schematic, board layers, 3D renders and turntable videos, regenerated on every push.
+
 ## Requirements
 
 - Python 3.9+
@@ -132,7 +138,7 @@ Turntables are not part of the default export, because they take tens of minutes
 1. Copy it to `.github/workflows/kicad-visor.yml` in the repository with your boards.
 2. In the repository's Settings > Pages, set the source to "GitHub Actions".
 
-It runs inside the official `kicad/kicad:10.0-full` image (KiCad 10 with 3D models); change the version to match the KiCad your boards were saved with. A `kicad-visor-config.py` at the root of the repository is used, as locally. Turntable videos are off by default; add `turntable` to `ONLY` in the workflow to enable them. The first run renders frames for tens of minutes per board; they are cached between runs and only rendered again when a board changes.
+[kicad-visor-demo](https://github.com/piruetasxyz/kicad-visor-demo) uses it, as a working example. It runs inside the official `kicad/kicad:10.0-full` image (KiCad 10 with 3D models); change the version to match the KiCad your boards were saved with. A `kicad-visor-config.py` at the root of the repository is used, as locally. Turntable videos are off by default; add `turntable` to `ONLY` in the workflow to enable them. The first run renders frames for tens of minutes per board; they are cached between runs and only rendered again when a board changes.
 
 ## Configuration
 
