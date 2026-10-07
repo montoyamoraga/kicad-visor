@@ -2,6 +2,8 @@
 
 Docs out of KiCad projects: schematics, PCB layers, 3D renders and seamlessly looping turntable videos of the board.
 
+Made by [piruetas](https://piruetas.xyz), an art studio from Chile.
+
 ## Requirements
 
 - Python 3.9+
@@ -139,3 +141,15 @@ export("path/to/repo", Config(outputs=["turntable"], turntables=[("y", "left")],
 ```
 
 Errors from missing or failing tools (`kicad-cli`, `rsvg-convert`, `ffmpeg`) raise `kicad_visor.ToolError`; bad settings raise `ConfigError` or `ValueError`.
+
+## About piruetas
+
+[piruetas](https://piruetas.xyz) is a Chilean art studio founded in 2022 by [montoyamoraga](https://montoyamoraga.io), based in Santiago de Chile, developing its first projects and products. kicad-visor started as the tool piruetas uses to document its own boards.
+
+- web: [piruetas.xyz](https://piruetas.xyz)
+- github: [github.com/piruetasxyz](https://github.com/piruetasxyz)
+- instagram: [@piruetas.xyz](https://instagram.com/piruetas.xyz)
+
+## License
+
+MIT, see [LICENSE](LICENSE).
