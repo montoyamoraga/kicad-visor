@@ -84,10 +84,11 @@ PCB_VIEWS: List[Dict[str, Any]] = [
 ]
 
 # 3D stills. Keys: side, rotate (x, y, z degrees), zoom, pan, pivot,
-# perspective, floor, quality.
+# perspective, floor, quality. Without a zoom, the camera is fitted so the
+# whole board stays in frame.
 RENDER_VIEWS: List[Dict[str, Any]] = [
-    {"name": "top", "side": "top", "zoom": 0.9},
-    {"name": "bottom", "side": "bottom", "zoom": 0.9},
+    {"name": "top", "side": "top"},
+    {"name": "bottom", "side": "bottom"},
     {"name": "iso-front", "rotate": (-45, 0, 45)},
     {"name": "iso-back", "rotate": (-135, 0, 135)},
     {"name": "perspective", "rotate": (-60, 0, 30), "perspective": True, "floor": True},

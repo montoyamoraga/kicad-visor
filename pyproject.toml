@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kicad-visor"
-version = "0.0.2"
+version = "0.0.3"
 description = "Docs out of KiCad projects: schematics, PCB layers, 3D renders and looping turntable videos"
 readme = "README.md"
 license = { file = "LICENSE" }

@@ -24,7 +24,7 @@ from kicad_visor.tools import ToolError
 from kicad_visor.turntable import video as turntable_video
 from kicad_visor.util import slug
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 __all__ = ["AXES", "Config", "ConfigError", "ToolError", "export", "turntable_video"]
 

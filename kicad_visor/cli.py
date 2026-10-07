@@ -55,7 +55,8 @@ exclude_drawing_sheet = False
 # pcb_views = [...]
 
 # 3D stills: name plus any of side, rotate (x, y, z), zoom, pan, pivot,
-# perspective, floor, quality, size. Defaults in kicad_visor.config.RENDER_VIEWS.
+# perspective, floor, quality, size. Without a zoom, the camera is fitted so
+# the whole board stays in frame. Defaults in kicad_visor.config.RENDER_VIEWS.
 # render_views = [...]
 render_size = (2000, 2000)
 render_quality = "basic"  # or "high": shadows and floor, ~5x slower (stills only)

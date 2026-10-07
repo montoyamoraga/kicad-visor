@@ -121,7 +121,7 @@ docs/kicad-visor/
 
 The `index.html` pages make the output a website: open them locally, or publish the folder (see below). They show whatever is in the output folder, so exporting only some outputs still gives complete pages.
 
-These folders are owned by kicad-visor and wiped on each export. Back-side 2D views are mirrored, as seen from behind the board. Silkscreen and board-outline views get a dark background in every format, since KiCad draws them in pale colors. 3D png files are transparent; jpg files get `background`.
+These folders are owned by kicad-visor and wiped on each export. Back-side 2D views are mirrored, as seen from behind the board. Silkscreen and board-outline views get a dark background in every format, since KiCad draws them in pale colors. 3D png files are transparent; jpg files get `background`. Like the turntables, 3D renders fit the camera to the board, so the whole board is in frame whatever its shape.
 
 Turntables are not part of the default export, because they take tens of minutes per board: add `--only turntable`. The defaults are two turntables, `z`/`ccw` and `y`/`right`, each rendered for every aspect (horizontal 1920×1080, vertical 1080×1920, square 1080×1080) and laid over every background (white, green, pink, peach): 24 videos per board.
 
