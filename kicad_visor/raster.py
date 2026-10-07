@@ -1,44 +1,54 @@
-"""Turning SVGs into PNG and JPG."""
+"""Turning SVGs into PNG, JPG and PDF."""
 
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 from kicad_visor import tools
 from kicad_visor.config import Config
 
 
-def _png(svg: Path, dest: Path, background: Optional[str], config: Config,
-         verbose: bool) -> None:
-    args = [tools.rsvg_convert(config.rsvg_convert),
-            "-d", str(config.dpi), "-p", str(config.dpi), "-o", str(dest)]
-    if background:
-        args += ["-b", background]
-    tools.run(args + [str(svg)], verbose)
+def _rsvg(svg: Path, dest: Path, config: Config, verbose: bool, *extra: str) -> Path:
+    tools.run([tools.rsvg_convert(config.rsvg_convert), *extra,
+               "-o", str(dest), str(svg)], verbose)
+    return dest
+
+
+def to_pdf(svg: Path, config: Config, verbose: bool = False) -> Path:
+    """Vector pdf with the same page as the svg."""
+    return _rsvg(svg, svg.with_suffix(".pdf"), config, verbose, "-f", "pdf")
+
+
+def flatten_jpg(png: Path, config: Config, verbose: bool = False) -> Path:
+    """jpg of `png` laid over the configured background (white if none)."""
+    color = config.background or "#ffffff"
+    jpg = png.with_suffix(".jpg")
+    tools.run([tools.ffmpeg(config.ffmpeg), "-y", "-loglevel", "error", "-i", str(png),
+               "-filter_complex",
+               f"[0]format=rgba,split[a][b];[a]drawbox=c={color}@1:t=fill[bg];"
+               "[bg][b]overlay=format=auto",
+               "-q:v", str(config.jpg_quality), str(jpg)], verbose)
+    return jpg
 
 
 def rasterize(svg: Path, config: Config, verbose: bool = False) -> List[Path]:
     """Write png and/or jpg next to `svg`, as requested by config.formats."""
+    wants_png = "png" in config.formats
+    wants_jpg = "jpg" in config.formats
+    if not (wants_png or wants_jpg):
+        return []
+
+    args = ["-d", str(config.dpi), "-p", str(config.dpi)]
+    if config.background:
+        args += ["-b", config.background]
+    png = _rsvg(svg, svg.with_suffix(".png"), config, verbose, *args)
+
     written = []
-    png = svg.with_suffix(".png")
-
-    if "png" in config.formats:
-        _png(svg, png, config.background, config, verbose)
+    if wants_jpg:
+        written.append(flatten_jpg(png, config, verbose))
+    if wants_png:
         written.append(png)
-
-    if "jpg" in config.formats:
-        # JPG has no alpha: reuse the png only if it was rendered opaque.
-        source = png
-        if not (png in written and config.background):
-            source = svg.with_suffix(".tmp.png")
-            _png(svg, source, config.background or "#ffffff", config, verbose)
-        jpg = svg.with_suffix(".jpg")
-        tools.run([tools.ffmpeg(config.ffmpeg), "-y", "-loglevel", "error",
-                   "-i", str(source), "-q:v", str(config.jpg_quality), str(jpg)],
-                  verbose)
-        if source != png:
-            source.unlink()
-        written.append(jpg)
-
+    else:
+        png.unlink()
     return written

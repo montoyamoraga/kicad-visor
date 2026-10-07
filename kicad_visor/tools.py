@@ -60,3 +60,12 @@ def run(args: List[str], verbose: bool = False) -> str:
             f"{result.stderr.strip() or result.stdout.strip()}"
         )
     return result.stdout
+
+
+def run_stderr(args: List[str]) -> str:
+    """Run a command for what it reports on stderr (ffmpeg's analysis filters)."""
+    result = subprocess.run(args, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise ToolError(f"{Path(args[0]).name} failed ({result.returncode}):\n"
+                        f"{result.stderr.strip()}")
+    return result.stderr
