@@ -27,8 +27,12 @@ class Project:
 
     @property
     def pcb(self) -> Optional[Path]:
+        """The board file, or None if missing or not laid out yet (no
+        footprints), so PCB, 3D and video exports skip it."""
         path = self.pro.with_suffix(".kicad_pcb")
-        return path if path.is_file() else None
+        if not path.is_file() or "(footprint " not in path.read_text(encoding="utf-8"):
+            return None
+        return path
 
 
 def _excluded(relative: Path, patterns: List[str]) -> bool:

@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import shutil
 from pathlib import Path
 from typing import List
 
 from kicad_visor import raster, tools
 from kicad_visor.config import Config
 from kicad_visor.discover import Project
+from kicad_visor.util import fresh_dir, slug
 
 
 def _style_args(config: Config) -> List[str]:
@@ -29,18 +29,14 @@ def export(project: Project, out: Path, config: Config,
     if sch is None:
         return []
 
-    # The folder belongs to kicad-visor: clearing it drops sheets that no
-    # longer exist instead of leaving stale images behind.
-    if out.exists():
-        shutil.rmtree(out)
-    out.mkdir(parents=True)
+    fresh_dir(out)
 
     cli = tools.kicad_cli(config.kicad_cli)
     style = _style_args(config)
     written: List[Path] = []
 
     if "pdf" in config.formats:
-        pdf = out / f"{project.name}.pdf"
+        pdf = out / f"{slug(project.name)}.pdf"
         tools.run([cli, "sch", "export", "pdf", *style, "-o", str(pdf), str(sch)],
                   verbose)
         written.append(pdf)
@@ -48,7 +44,9 @@ def export(project: Project, out: Path, config: Config,
     if any(f in config.formats for f in ("svg", "png", "jpg")):
         tools.run([cli, "sch", "export", "svg", *style, "-o", str(out), str(sch)],
                   verbose)
-        for svg in sorted(out.glob("*.svg")):
+        # kicad-cli names sheets "<project>-<sheet name>.svg", spaces and all.
+        for plotted in sorted(out.glob("*.svg")):
+            svg = plotted.rename(out / f"{slug(plotted.stem)}.svg")
             written += raster.rasterize(svg, config, verbose)
             if "svg" in config.formats:
                 written.append(svg)
